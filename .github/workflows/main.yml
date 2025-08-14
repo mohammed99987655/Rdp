@@ -15,11 +15,13 @@ jobs:
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
         net user mohammed999 Mohammed@1234 /add
         net localgroup administrators mohammed999 /add
+
     - name: تثبيت Google Chrome
       run: |
         Invoke-WebRequest "https://dl.google.com/chrome/install/latest/chrome_installer.exe" -OutFile "chrome_installer.exe"
         Start-Process ".\chrome_installer.exe" -Args "/silent /install" -Wait
         Remove-Item "chrome_installer.exe"
+
     - name: تشغيل Pinggy عبر SSH وطباعة رابط الاتصال
       shell: bash
       run: |
@@ -27,10 +29,12 @@ jobs:
         echo "👤 المستخدم: mohammed999"
         echo "🔑 كلمة المرور: Mohammed@1234"
         echo "⏳ جاري إنشاء نفق Pinggy..."
+
+        ssh -p 443 -R 0:localhost:3389 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 6PJwxLEUlPO+tcp@ap.free.pinggy.io | tee pinggy_log.txt &
         
-        ssh -p 443 -R0:localhost:3389 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 6PJwxLEUlPO+tcp@eu.free.pinggy.io | tee pinggy_log.txt &
         sleep 10
         echo "🌐 رابط الاتصال:"
         grep -i "tcp://" pinggy_log.txt || echo "❌ لم يتم العثور على رابط."
+        
         echo "🕒 سيتم الإبقاء على الاتصال لمدة ساعة (60 دقيقة)..."
-         sleep 3600000
+        sleep 3600
